@@ -1,17 +1,17 @@
 # DS200 LAB 5 - People Counting Pipeline
 
-He thong gom 3 server TCP xu ly luong khung hinh camera va dem so nguoi trong moi khung hinh.
+Hệ thống gồm 3 server TCP xử lý luồng khung hình camera và đếm số người trong mỗi khung hình.
 
-## Kien truc
+## Kiến trúc
 
-1. `server1_camera.py`: doc camera, video, hoac tao frame gia lap neu may khong co camera. Server nay gui frame dang JPEG base64 qua TCP.
-2. `server2_processor.py`: nhan frame, chay OpenCV HOG people detector, tao bounding box cho cac doi tuong `person`, roi gui ket qua sang server luu tru.
-3. `server3_storage.py`: nhan ket qua va luu JSON Lines theo partition ngay trong `data/results/date=YYYY-MM-DD/results.jsonl`.
-4. `analytics_spark.py`: doc du lieu da luu bang PySpark de tong hop so nguoi theo camera.
+1. `server1_camera.py`: đọc camera, video, hoặc tạo frame giả lập nếu máy không có camera. Server này gửi frame dạng JPEG base64 qua TCP.
+2. `server2_processor.py`: nhận frame, chạy OpenCV HOG people detector, tạo bounding box cho các đối tượng `person`, rồi gửi kết quả sang server lưu trữ.
+3. `server3_storage.py`: nhận kết quả và lưu JSON Lines theo partition ngày trong `data/results/date=YYYY-MM-DD/results.jsonl`.
+4. `analytics_spark.py`: đọc dữ liệu đã lưu bằng PySpark để tổng hợp số người theo camera.
 
-Giao thuc truyen du lieu duoc viet theo mau `tcp_example.py`: moi message la mot JSON object ket thuc bang ky tu xuong dong.
+Giao thức truyền dữ liệu được viết theo mẫu `tcp_example.py`: mỗi message là một JSON object kết thúc bằng ký tự xuống dòng.
 
-## Cai dat
+## Cài đặt
 
 ```bash
 python3 -m venv .venv
@@ -19,15 +19,15 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Neu muon chay phan tong hop du lieu lon bang PySpark:
+Nếu muốn chạy phần tổng hợp dữ liệu lớn bằng PySpark:
 
 ```bash
 pip install -r requirements-bigdata.txt
 ```
 
-## Chay he thong
+## Chạy hệ thống
 
-Mo 3 terminal theo dung thu tu:
+Mở 3 terminal theo đúng thứ tự:
 
 Terminal 1:
 
@@ -47,21 +47,21 @@ Terminal 3:
 python server1_camera.py --source 0 --limit 30 --fps 5
 ```
 
-Neu khong co webcam, chuong trinh tu tao frame gia lap:
+Nếu không có webcam, chương trình tự tạo frame giả lập:
 
 ```bash
 python server1_camera.py --source 999 --limit 10 --fps 2
 ```
 
-Co the dung video file:
+Có thể dùng video file:
 
 ```bash
 python server1_camera.py --source path/to/video.mp4 --limit 100 --fps 10
 ```
 
-## Ket qua luu tru
+## Kết quả lưu trữ
 
-Moi dong trong file JSONL co dang:
+Mỗi dòng trong file JSONL có dạng:
 
 ```json
 {
@@ -82,17 +82,17 @@ Moi dong trong file JSONL co dang:
 }
 ```
 
-## Phan tich du lieu lon
+## Phân tích dữ liệu lớn
 
-Du lieu duoc luu theo dinh dang JSONL partition theo ngay, phu hop cho xu ly batch/stream bang cac cong cu du lieu lon. Chay tong hop bang PySpark:
+Dữ liệu được lưu theo định dạng JSONL partition theo ngày, phù hợp cho xử lý batch/stream bằng các công cụ dữ liệu lớn. Chạy tổng hợp bằng PySpark:
 
 ```bash
 python analytics_spark.py --input data/results
 ```
 
-## Commit len GitHub
+## Commit lên GitHub
 
-Thu muc nay can duoc commit len repository GitHub cua sinh vien:
+Thư mục này cần được commit lên repository GitHub của sinh viên:
 
 ```bash
 git add .
